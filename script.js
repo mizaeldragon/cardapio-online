@@ -178,7 +178,7 @@ checkoutBtn.addEventListener("click", () => {
       currency: "BRL",
     })}\n\n✅ *Aguardo a confirmação do pedido!*`
   );
-  const phone = "99981979728";
+  const phone = "5599981979728";
 
   window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
 
