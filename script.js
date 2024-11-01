@@ -11,38 +11,30 @@ const addressWarn = document.getElementById("address-warn");
 
 let cart = [];
 
-// ABRINDO MODAL DO CARRINHO
 cartBtn.addEventListener("click", () => {
   updateCartModal();
   cartModal.style.display = "flex";
 });
 
-// FECHAR MODAL QUANDO CLICAR FORA
 cartModal.addEventListener("click", (event) => {
   if (event.target === cartModal) {
     cartModal.style.display = "none";
   }
 });
 
-// FECHAR MODAL NO BUTTON DE FECHAR
 closeModalBtn.addEventListener("click", () => {
   cartModal.style.display = "none";
 });
 
-// ADICIONANDO ITEM NO CARRINHO
-
 menu.addEventListener("click", (event) => {
-  //   console.log(event.target);
   let parentButton = event.target.closest(".add-to-cart-btn");
-  // o (CLOSEST) é que quando eu clicar no item que tem a class ou um parente perto de quem tem a class ele pega o item pra mim
+
   if (parentButton) {
     const name = parentButton.getAttribute("data-name");
     const price = parseFloat(parentButton.getAttribute("data-price"));
     addToCart(name, price);
   }
 });
-
-// FUNCAO PARA ADICIONAR NO CARRINHO
 
 function addToCart(name, price) {
   const existingItem = cart.find((item) => item.name === name);
@@ -59,8 +51,6 @@ function addToCart(name, price) {
 
   updateCartModal();
 }
-
-// ATUALIZA O CARRINHO
 
 function updateCartModal() {
   cartItemsContainer.innerHTML = "";
@@ -93,7 +83,7 @@ function updateCartModal() {
 
     total += item.price * item.quantity;
 
-    cartItemsContainer.appendChild(cartItemElement); // para adicionar o elemento no modal
+    cartItemsContainer.appendChild(cartItemElement);
   });
 
   cartTotal.textContent = total.toLocaleString("pt-BR", {
@@ -103,8 +93,6 @@ function updateCartModal() {
 
   cartCounter.innerHTML = cart.length;
 }
-
-// FUNCAO PARA REMOVER ITEM DO MODAL
 
 cartItemsContainer.addEventListener("click", (event) => {
   if (event.target.classList.contains("remove-item-modal")) {
@@ -125,24 +113,25 @@ function removeItemCart(name) {
       updateCartModal();
       return;
     }
-    // remove item do modal
     cart.splice(index, 1);
     updateCartModal();
   }
 }
 
-// PEGAR VALOR DO INPUT
-
 addressInput.addEventListener("input", (event) => {
-  let inputValue = event.target.value;
+  let inputValue = event.target.value.trim();
 
-  if (inputValue !== "") {
+  if (inputValue === "") {
+    addressWarn.classList.remove("hidden");
+    addressInput.classList.add("border-red-500");
+    checkoutBtn.setAttribute("disabled", true);
+  } else {
     addressWarn.classList.add("hidden");
     addressInput.classList.remove("border-red-500");
+    checkoutBtn.removeAttribute("disabled");
   }
 });
 
-// FAZ APARECER O ERROR, SE O INPUT TIVER VAZIO
 checkoutBtn.addEventListener("click", () => {
   const isOpen = checkRestaurantOpen();
   if (!isOpen) {
@@ -164,37 +153,45 @@ checkoutBtn.addEventListener("click", () => {
   }
 
   if (cart.length === 0) return;
-  if (addressInput.value === "") {
+  if (addressInput.value.trim() === "") {
     addressWarn.classList.remove("hidden");
     addressInput.classList.add("border-red-500");
+    checkoutBtn.setAttribute("disabled", true);
+    return;
   }
 
-  // ENVIAR PEDIDO PARA O WHATSSAPP
+  let total = cart.reduce((acc, item) => acc + item.price * item.quantity, 0);
 
   const cartItems = cart
     .map((item) => {
-      return ` ${item.name} Quantidade: (${item.quantity}) Preço: ${item.price} |`;
+      return `🍔 *${item.name}*\nQuantidade: ${
+        item.quantity
+      }\nPreço Unitário: R$ ${item.price.toFixed(2)}\n`;
     })
-    .join("");
+    .join("\n");
 
-  const message = encodeURIComponent(cartItems);
+  const message = encodeURIComponent(
+    `🛒 *Resumo do Pedido* 🛒👌\n\n${cartItems}\n📍 *Endereço de Entrega:*\n${
+      addressInput.value
+    }\n\n💵 *Total:* ${total.toLocaleString("pt-BR", {
+      style: "currency",
+      currency: "BRL",
+    })}\n\n✅ *Aguardo a confirmação do pedido!*`
+  );
   const phone = "99981979728";
 
-  window.open(
-    `https://wa.me/${phone}?text=${message} Endereço: ${addressInput.value}`,
-    "_blank"
-  );
+  window.open(`https://wa.me/${phone}?text=${message}`, "_blank");
 
   cart = [];
   updateCartModal();
-});
 
-// VERIFICAR A HORA E MANIPULAR O CARD DO HORARIO
+  addressInput.value = "";
+});
 
 function checkRestaurantOpen() {
   const data = new Date();
   const hora = data.getHours();
-  return hora >= 18 && hora < 22;
+  return hora >= 13 && hora < 22;
 }
 
 const spanItem = document.getElementById("date-span");
