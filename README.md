@@ -2,7 +2,7 @@ CARDAPIO-ONLINE Esse projeto foi feito para mostrar a interface de serviços de 
 
 CARDAPIO-ONLINE 🚀 Finalizado.
 
-LINK DO SITE: [https://mizaeldragon.github.io/coffe/](https://cardapio-online-coral.vercel.app/)
+LINK DO SITE: https://cardapio-online-coral.vercel.app/
 
 🛠 Tecnologias As seguintes ferramentas foram usadas na construção do projeto:
 
